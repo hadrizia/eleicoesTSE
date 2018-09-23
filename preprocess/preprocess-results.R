@@ -19,8 +19,8 @@ get_resultado_columns <- function(ano) {
 summarise_votos <- function(df) {
   df %>% 
     filter(!str_detect(desc_sit_cand_tot, regex('2º TURNO')) & descricao_cargo %in% cargos) %>% 
-    dplyr::group_by(ano_eleicao, sigla_uf, nome_municipio, 
-                    numero_cand, nome_candidato,
+    dplyr::group_by(ano, sigla_uf, nome_municipio, 
+                    sq_candidato, nome_candidato,
                     descricao_cargo, sigla_partido, desc_sit_cand_tot) %>%
     dplyr::summarize(total_votos = sum(tot_votos))
 }
@@ -39,9 +39,11 @@ get_resultados_por_ano <- function(ano = 2014) {
   # Renomeia as colunas do dataframe
   names(df) <- get_resultado_columns(ano)
   
-  # Sumarizando votos (filtrando segundo turno e cargos desejados (deputados estaduais e federais))
+  # Sumarizando votos (filtrando segundo turno e cargos desejados (deputados federais))
   df <- df %>% 
     summarise_votos()
+  
+  write.csv(df, paste0(here::here("data/resultados/Resultados-"), ano, ".csv"), row.names=FALSE)
   
   return(df)
 }

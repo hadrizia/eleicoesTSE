@@ -16,14 +16,6 @@ get_despesas_columns <- function(ano) {
   }
 }
 
-# Calcula o total de despesa por candidato
-get_total_despesa <- function(df) {
-  df %>% 
-    dplyr::group_by(nome_candidato, sq_candidato, sigla_uf, sigla_partido, ano, descricao_cargo) %>%
-    summarize(total_despesa = sum(valor_despesa),
-              media_despesa = mean(valor_despesa))
-}
-
 # Recupera colunas comuns
 preprocess_despesa <- function (df){
   df <- df %>% 
@@ -34,10 +26,19 @@ preprocess_despesa <- function (df){
     select(c(ano, sq_candidato, 
              nome_candidato, descricao_cargo,  sigla_uf, 
              sigla_partido, valor_despesa, 
-             tipo_despesa, data_despesa))
+             tipo_despesa, data_despesa, nome_fornecedor))
   
-  df %>%
-    get_total_despesa()
+  df %>% 
+    group_by(nome_candidato, sq_candidato, sigla_uf, descricao_cargo, ano, nome_fornecedor, valor_despesa) %>% 
+    summarize(qtd_despesas_by_fornecedor = n(),
+              qtd_fornecedores_by_fornecedor = n_distinct(nome_fornecedor),
+              tot_receita = sum(valor_despesa)) %>%
+    ungroup() %>% 
+    group_by(nome_candidato, sq_candidato, sigla_uf, descricao_cargo, ano) %>% 
+    summarize(qtd_despesas = sum(qtd_despesas_by_fornecedor),
+              qtd_fornecedores = sum(qtd_fornecedores_by_fornecedor),
+              total_despesa = sum(valor_despesa),
+              media_despesa = mean(valor_despesa))
 }
 
 # Retorna um dataframe único para os despesas dos candidatos em um ano.

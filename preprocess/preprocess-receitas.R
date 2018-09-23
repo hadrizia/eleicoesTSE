@@ -16,6 +16,7 @@ get_resultado_columns <- function(ano) {
   }
 }
 
+
 # Calcula o total de receita por candidato
 get_total_receita <- function(df) {
   df %>% 
@@ -46,15 +47,25 @@ preprocess_receita <- function (df){
              nome_candidato, descricao_cargo, 
              numero_cand, sigla_uf, 
              sigla_partido, valor_receita, 
-             tipo_receita, data_receita))
-    
+             tipo_receita, data_receita, nome_doador))
  
  receita_by_tipo = df %>% 
    aggregate_by_tipo_receita() %>% 
    data.table::data.table()
  
+ df <- df %>% 
+   group_by(nome_candidato, sq_candidato, sigla_uf, descricao_cargo, ano, nome_doador, valor_receita) %>% 
+   summarize(qtd_doacoes_by_doador = n(),
+             qtd_doadores_by_doador = n_distinct(nome_doador),
+             tot_receita = sum(valor_receita)) %>%
+   ungroup() %>% 
+   group_by(nome_candidato, sq_candidato, sigla_uf, descricao_cargo, ano) %>% 
+   summarize(qtd_doacoes = sum(qtd_doacoes_by_doador),
+             qtd_doadores = sum(qtd_doadores_by_doador),
+             total_receita = sum(valor_receita),
+             media_receita = mean(valor_receita))
+ 
  df = merge(df %>% 
-              get_total_receita() %>% 
               data.table::data.table(), 
             receita_by_tipo, 
             by = c("nome_candidato", "sq_candidato",
@@ -83,12 +94,14 @@ get_receitas_por_ano <- function(ano) {
   
   df$ano = ano
   
+  #df <- data.frame(sapply(df, function(x) gsub("\"", "", x)), stringsAsFactors = F)
+  
   # Sumarizando receitas de acordo com o tipo da receita
   df <- df %>% 
     preprocess_receita()
   
   write.csv(df, paste0(here::here("data/prestacao_contas/Receitas-"), ano, ".csv"), row.names=FALSE)
-  #return(df)
+  return(df)
 }
 
 preprocess_resultados_total <- function(ano_inicial, ano_final) {

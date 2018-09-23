@@ -1,6 +1,6 @@
 # Dados das eleições 
 
-Este repositório tem como objetivo 
+Este repositório tem como objetivo prover os dados eleitorais dos candidatos ao cargo de deputado federal para auxiliar na disciplina de Ciência de Dados Preditiva no período de 2018.2.
 
 ## Os dados
 
@@ -17,7 +17,6 @@ Os dados originais estão disponíveis no site do [TSE](http://tse.jus.br/eleico
   * `data`: Que está no .gitignore, mas pode ser baixado [aqui]();
   * `preprocess`: Onde estão os scripts feitos para o preprocessamento dos dados (padronização das colunas, sumarização, etc.);
   * `utils`: Com os arquivos utilizados nos scripts, como de constantes; 
-  * ``: 
   
   ## Como executar
   

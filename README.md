@@ -25,7 +25,7 @@ Os dados originais estão disponíveis no site do [TSE](http://tse.jus.br/eleico
   
   ## Como executar
   
-   1. Baixe o arquivo `data.zip` que está disponíveis no [drive](https://drive.google.com/open?id=12ZgoKWbXcwEYhVrCKEI7nxoL4NxYcaC7), descompacte-o e cole o diretório data dentro da pasta do repositório;
+   1. Baixe o arquivo `data.zip` que está disponível no [drive](https://drive.google.com/open?id=12ZgoKWbXcwEYhVrCKEI7nxoL4NxYcaC7), descompacte-o e cole o diretório data dentro da pasta do repositório;
    2. Na pasta do repositório, execute o script R através do comando abaixo. (É necessário baixar as bibliotecas **tidyverse** e **data.table** antes!)   
    ```
     Rscript process.R

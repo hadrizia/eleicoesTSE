@@ -28,7 +28,7 @@ get_total_receita <- function(df) {
 # Agrega por tipo de receita
 aggregate_by_tipo_receita <- function(df){
   df %>% 
-    filter(str_detect(tolower(tipo_receita), 'recursos (de|)( pessoas| outros candidatos|próprios)')) %>%  
+    filter(str_detect(tolower(tipo_receita), 'recursos (de|)( pessoas| outros candidatos|próprios| partido(s|))')) %>%  
     mutate(tipo_receita = tolower(tipo_receita)) %>% 
     group_by(nome_candidato, sq_candidato, sigla_uf, descricao_cargo, ano, tipo_receita) %>% 
     summarize(total_receita = sum(as.numeric(valor_receita))) %>% 

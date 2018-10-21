@@ -24,12 +24,13 @@ merge_all <- function(despesas_df, receitas_df, resultados_df, candidatos_df){
 process_dataframe <- function(df){
   df <-
     df %>%
-    select(-nome_municipio) %>%
+   # select(-nome_municipio) %>%
     group_by(ano, sq_candidato, nome_candidato,
              sigla_uf, sigla_partido, qtd_doacoes,
              qtd_doadores, total_receita, media_receita,
              `recursos de outros candidatos/comitês`,
              `recursos de pessoas físicas`, `recursos de pessoas jurídicas`, `recursos próprios`,
+             `recursos de partido político`,
              qtd_despesas, qtd_fornecedores, total_despesa,
              media_despesa, descricao_cargo, sexo,
              grau_instrucao, estado_civil, descricao_ocupacao) %>%
@@ -57,11 +58,11 @@ merge_all_por_ano <- function(ano=2014) {
 }
 
 build_all_data <- function() {
-  anos <- seq(2006, 2014, by=4)
+  anos = 2014#<- seq(2006, 2010, by=4)
   df <- do.call(rbind, lapply(anos, merge_all_por_ano))
 
   names(df) <- col_names_dataframe
-  write.csv(df, paste0(here::here("data/preprocessed/eleicoes_2006_a_2014.csv")), row.names=FALSE)
+  write.csv(df, paste0(here::here("data/preprocessed/eleicoes_2014.csv")), row.names=FALSE)
   print('Done! :)')
 }
 

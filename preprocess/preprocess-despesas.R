@@ -60,7 +60,7 @@ get_despesas_por_ano <- function(ano = 2014) {
   # Renomeia as colunas do dataframe
   names(df) <- get_despesas_columns(ano)
   
-  #df <- data.frame(sapply(df, function(x) gsub("\"", "", x)), stringsAsFactors = F)
+  df <- data.frame(sapply(df, function(x) gsub("\"", "", x)), stringsAsFactors = F)
   
   df$ano = ano
   

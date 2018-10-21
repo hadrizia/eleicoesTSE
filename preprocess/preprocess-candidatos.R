@@ -9,11 +9,12 @@ source(here::here("utils/constants.R"))
 # disponíveis em outra linha com o resultado final do segundo turno) e seleciona apenas variáveis úteis.
 preprocess_candidatos <- function(df) {
   df %>%
-    filter(!str_detect(desc_sit_cand_tot, regex('2º TURNO')) & descricao_cargo %in% cargos) %>% 
+    filter(!str_detect(desc_sit_cand_tot, regex('2º TURNO')) & toupper(descricao_cargo) %in% cargos & grepl('^ELEITO', toupper(desc_sit_cand_tot))) %>% 
     select(ano, sq_candidato, sigla_uf, 
            nome_candidato,  sigla_partido,
            sexo, estado_civil, grau_instrucao, 
-           descricao_ocupacao, descricao_cargo)
+           descricao_ocupacao, descricao_cargo, cor_raca, data_nascimento, descricao_nacionalidade) %>% 
+    mutate(descricao_cargo = toupper(descricao_cargo))
 }
 
 # Recupera os nomes das colunas correspondentes.
@@ -22,8 +23,10 @@ get_candidatos_columns <- function(ano) {
     column_names <- col_names_candidatos_ate_2010
   } else if (ano == 2012){
     column_names <- col_names_candidatos_2012
-  } else if (ano >= 2014){
+  } else if (ano >= 2014 & ano < 2018){
     column_names <- col_names_candidatos_2014_em_diante
+  } else if (ano == 2018){
+    column_names <- col_names_candidatos_2018
   }
 }
 
@@ -54,6 +57,38 @@ preprocess_candidatos_por_ano <- function (ano = 2014) {
   
   return(df)
 } 
+
+get_candidatos_por_filename <- function(filename, ano){
+  print(paste('Processando arquivo: ', filename))
+  df <- readr::read_delim(filename, delim = ";", col_names=FALSE, local = readr::locale("br", encoding = "latin1"))
+  df <- df %>% as.data.frame()
+  
+  # Renomeia as colunas do dataframe
+  names(df) <- get_candidatos_columns(ano)
+  
+  # Remove cabeçalho no ano de 2018
+  if(ano == 2018){
+    df <- df %>%
+      slice(2:nrow(df))
+  }
+  
+  # Sumarizando votos (filtrando segundo turno e cargos desejados)
+  df <- df %>% 
+    preprocess_candidatos()
+  
+  return(df)
+}
+
+get_resultados_por_ano_otimizado <- function(ano){
+  print(paste('Processando resultados do ano: ', ano))
+  # Nome de todos os arquivos necessários
+  filenames <- list.files(paste0(here::here("data/candidatos/"), ano), pattern="consulta_cand_*", full.names=TRUE)
+  
+  res <- purrr::pmap(list(filenames), function(x) get_candidatos_por_filename(x, ano))
+  candidatos <- purrr::map_df(res, ~ .)
+  
+  write.csv(candidatos, paste0(here::here("data/candidatos/candidatos_"), ano, ".csv"), row.names=FALSE)
+}
 
 # Preprocessa e salva o dataframe recuperado na função get_votacao_candidato_por_ano() para os anos de um intervalo.
 preprocess_candidatos_total <- function(ano_inicial, ano_final) {
